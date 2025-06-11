@@ -1,0 +1,205 @@
+    <!DOCTYPE html>
+    <html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Licença Vencida</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <style>
+            .gradient-bg {
+                background: linear-gradient(135deg, #ff4d4d 0%, #f9cb28 100%);
+            }
+            .pulse-animation {
+                animation: pulse 2s infinite;
+            }
+            @keyframes pulse {
+                0% {
+                    transform: scale(1);
+                }
+                50% {
+                    transform: scale(1.05);
+                }
+                100% {
+                    transform: scale(1);
+                }
+            }
+        </style>
+    </head>
+    <body class="min-h-screen gradient-bg flex items-center justify-center p-4">
+        <div class="max-w-2xl w-full bg-white rounded-xl shadow-2xl overflow-hidden pulse-animation">
+            <div class="md:flex">
+                <div class="md:w-2/5 bg-red-600 p-8 flex items-center justify-center">
+                    <div class="text-center text-white">
+                        <i class="fas fa-exclamation-triangle text-6xl mb-4"></i>
+                        <h2 class="text-3xl font-bold">LICENÇA EXPIRADA</h2>
+                        <p class="mt-2 opacity-90">Sua licença de uso chegou ao fim</p>
+                    </div>
+                </div>
+                
+                <div class="md:w-3/5 p-8">
+                    <div class="flex justify-between items-start mb-6">
+                        <div>
+                            <h1 class="text-2xl font-bold text-gray-800">Licença Vencida</h1>
+                            <p class="text-gray-600">Infelizmente seu período de acesso terminou.</p>
+                        </div>
+                        <div class="flex items-center justify-center w-12 h-12 rounded-full bg-red-100 text-red-600">
+                            <i class="fas fa-calendar-times text-xl"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="p-4 bg-red-50 rounded-lg border-l-4 border-red-600">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 text-red-600">
+                                    <i class="fas fa-info-circle"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="text-sm font-medium text-red-800">Data limite: 16/05/2025</h3>
+                                    <p class="text-sm text-red-700">Sua licença expirou em 16 de maio de 2025.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="p-4 bg-yellow-50 rounded-lg border-l-4 border-yellow-500">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 text-yellow-500">
+                                    <i class="fas fa-exclamation"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="text-sm font-medium text-yellow-800">Renovação necessária</h3>
+                                    <p class="text-sm text-yellow-700">Entre em contato para renovar sua licença.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8">
+                        <h3 class="text-lg font-medium text-gray-900">Entre em contato para renovação</h3>
+                        <p class="mt-1 text-gray-600">Clique no botão abaixo para falar conosco no WhatsApp:</p>
+                        
+                        <div class="mt-6">
+                            <a href="https://wa.me/5588981126816" 
+                            class="w-full flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-green-600 hover:bg-green-700 transition duration-300 ease-in-out">
+                                <i class="fab fa-whatsapp mr-2 text-xl"></i>
+                                Conversar no WhatsApp
+                            </a>
+                        </div>
+                        
+                        <div class="mt-8 pt-6 border-t border-gray-200">
+                            <div class="flex justify-center space-x-6">
+                                <a href="#" class="text-gray-400 hover:text-gray-500">
+                                    <i class="fab fa-instagram text-xl"></i>
+                                </a>
+                                <a href="#" class="text-gray-400 hover:text-gray-500">
+                                    <i class="fab fa-facebook text-xl"></i>
+                                </a>
+                                <a href="#" class="text-gray-400 hover:text-gray-500">
+                                    <i class="fas fa-envelope text-xl"></i>
+                                </a>
+                            </div>
+                            <p class="mt-4 text-center text-sm text-gray-500">
+                                &copy; 2025 Todos os direitos reservados.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+              const passwordInput = document.getElementById('password');
+              const togglePassword = document.getElementById('togglePassword');
+              const loginForm = document.getElementById('loginForm');
+              const errorMessage = document.getElementById('errorMessage');
+              const expiredModal = document.getElementById('expiredModal');
+              const closeExpiredModal = document.getElementById('closeExpiredModal');
+            
+              fetch('dados.json')
+                .then(response => response.json())
+                .then(dados => {
+                  const CORRECT_PASSWORD = dados.senha;
+                  const EXPIRATION_DATE = new Date(dados.validade);
+                  const TODAY = new Date();
+            
+                  const storedPassword = localStorage.getItem('senha');
+            
+                  if (storedPassword === CORRECT_PASSWORD) {
+                    if (TODAY < EXPIRATION_DATE) {
+                      // Licença válida → redireciona para index.html
+                      window.location.href = "index.html";
+                      return;
+                    } else {
+                      // Licença vencida → remove senha e permanece na página atual
+                      localStorage.removeItem('senha');
+                      // Pode mostrar mensagem ou modal aqui, se desejar
+                    }
+                  } else {
+                    // Não autenticado → redireciona para página de login
+                    window.location.href = "login.html";
+                    return;
+                  }
+            
+                  // Aqui o usuário está na página porque a licença está vencida.
+                  // Se quiser mostrar um modal ou algo, pode colocar o código aqui.
+            
+                  // Caso queira ativar funcionalidade para login, pode deixar seu formulário funcionando normalmente:
+                  if (togglePassword && passwordInput) {
+                    togglePassword.addEventListener('click', function () {
+                      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                      passwordInput.setAttribute('type', type);
+                      togglePassword.innerHTML = type === 'password'
+                        ? '<i class="fas fa-eye"></i>'
+                        : '<i class="fas fa-eye-slash"></i>';
+                    });
+                  }
+            
+                  if (loginForm) {
+                    loginForm.addEventListener('submit', function (e) {
+                      e.preventDefault();
+                      const enteredPassword = passwordInput.value.trim();
+            
+                      if (enteredPassword !== CORRECT_PASSWORD) {
+                        errorMessage.textContent = "Senha incorreta. Por favor, tente novamente.";
+                        errorMessage.classList.remove('hidden');
+                        passwordInput.focus();
+                        return;
+                      }
+            
+                      if (TODAY >= EXPIRATION_DATE) {
+                        localStorage.removeItem('senha');
+                        expiredModal.classList.remove('hidden');
+                        return;
+                      }
+            
+                      // Autenticado com sucesso e licença válida
+                      localStorage.setItem('senha', CORRECT_PASSWORD);
+                      window.location.href = "index.html";
+                    });
+                  }
+            
+                  if (closeExpiredModal && expiredModal) {
+                    closeExpiredModal.addEventListener('click', function () {
+                      expiredModal.classList.add('hidden');
+                    });
+            
+                    expiredModal.addEventListener('click', function (e) {
+                      if (e.target === expiredModal) {
+                        expiredModal.classList.add('hidden');
+                      }
+                    });
+                  }
+                })
+                .catch(error => {
+                  console.error('Erro ao carregar dados.json:', error);
+                  if (errorMessage) {
+                    errorMessage.textContent = "Erro ao carregar informações de licença.";
+                    errorMessage.classList.remove('hidden');
+                  }
+                });
+            });
+            </script>
+            
+        
+    </body>
+    </html>

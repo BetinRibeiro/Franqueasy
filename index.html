@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Franqueasy - Calculadora de Viabilidade de Franquias</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf9 100%);
+            min-height: 100vh;
+        }
+        
+        .card {
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+        
+        .input-field:focus {
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.3);
+        }
+        
+        .thermometer {
+            height: 250px;
+            width: 50px;
+            position: relative;
+            margin: 0 auto;
+        }
+        
+        .thermal-bg {
+            height: 200px;
+            width: 30px;
+            background: linear-gradient(to top, #4ade80, #f59e0b, #ef4444);
+            border-radius: 15px;
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            overflow: hidden;
+        }
+        
+        .thermal-fluid {
+            height: 50%;
+            width: 100%;
+            background-color: #f43f5e;
+            border-radius: 0 0 15px 15px;
+            position: absolute;
+            bottom: 0;
+            transition: height 1.5s ease;
+        }
+        
+        .thermal-bulb {
+            height: 50px;
+            width: 50px;
+            background-color: #f43f5e;
+            border-radius: 50%;
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .result-tag {
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-indigo-600 to-purple-700 text-white py-6 px-4 shadow-lg">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center">
+            <div class="flex items-center mb-4 md:mb-0">
+                <i class="fas fa-store text-3xl mr-3"></i>
+                <h1 class="text-3xl font-bold">Franqueasy</h1>
+            </div>
+            <p class="text-indigo-100 text-center italic">Sua ferramenta para avaliar oportunidades de franquia</p>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <div id="app" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Form Section -->
+            <div id="formSection" class="lg:col-span-1">
+                <div class="card bg-white rounded-xl p-6">
+                    <div class="flex justify-between items-center mb-6 pb-3 border-b-2 border-purple-200">
+                        <h2 class="text-2xl font-bold text-gray-800">Dados da Franquia</h2>
+                        <!-- Coloque isso no corpo do seu HTML onde quiser exibir -->
+<div id="relogio" style="font-family: monospace; font-size: 1.5em;"></div>
+                    </div>
+                    
+                    <form id="franchiseForm" class="space-y-6">
+                        <!-- Seção 1: Investimento Inicial -->
+                        <div class="space-y-4">
+                            <h3 class="text-lg font-semibold text-indigo-700">
+                                <i class="fas fa-piggy-bank mr-2"></i> Investimento Inicial
+                            </h3>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Taxa de franquia (R$)</label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">R$</span>
+                                    <input type="number" class="input-field w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300" id="taxaFranquia" required min="0">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Custo de instalação/reforma (R$)</label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">R$</span>
+                                    <input type="number" class="input-field w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300" id="custoInstalacao" required min="0">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Capital de giro (R$)</label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">R$</span>
+                                    <input type="number" class="input-field w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300" id="capitalGiro" required min="0">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Equipamentos/móveis (R$)</label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">R$</span>
+                                    <input type="number" class="input-field w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300" id="equipamentos" required min="0">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Seção 2: Custos Fixos Mensais -->
+                        <div class="space-y-4">
+                            <h3 class="text-lg font-semibold text-indigo-700">
+                                <i class="fas fa-file-invoice-dollar mr-2"></i> Custos Mensais
+                            </h3>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Aluguel (R$)</label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">R$</span>
+                                    <input type="number" class="input-field w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300" id="aluguel" required min="0">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Salários e encargos (R$)</label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">R$</span>
+                                    <input type="number" class="input-field w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300" id="salarios" required min="0">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Royalties (%)</label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500">%</span>
+                                    <input type="number" step="0.1" class="input-field w-full pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300" id="royalties" required min="0" max="100">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Fundo de propaganda (%)</label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500">%</span>
+                                    <input type="number" step="0.1" class="input-field w-full pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300" id="fundoPropaganda" required min="0" max="100">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Seção 3: Receitas Estimadas -->
+                        <div class="space-y-4">
+                            <h3 class="text-lg font-semibold text-indigo-700">
+                                <i class="fas fa-chart-line mr-2"></i> Receitas Estimadas
+                            </h3>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Faturamento mensal esperado (R$)</label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">R$</span>
+                                    <input type="number" class="input-field w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300" id="faturamentoMensal" required min="0">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Ticket médio (R$)</label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">R$</span>
+                                    <input type="number" step="0.01" class="input-field w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300" id="ticketMedio" required min="0">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Clientes mensais estimados</label>
+                                <input type="number" class="input-field w-full py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300" id="clientesMensais" required min="0">
+                            </div>
+                        </div>
+                        
+                        <!-- Seção 4: Mercado Local -->
+                        <div class="space-y-4">
+                            <h3 class="text-lg font-semibold text-indigo-700">
+                                <i class="fas fa-map-marker-alt mr-2"></i> Mercado Local
+                            </h3>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">População da região</label>
+                                <input type="number" class="input-field w-full py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300" id="populacao" required min="0">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Concorrentes diretos</label>
+                                <input type="number" class="input-field w-full py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300" id="concorrentes" required min="0">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Visibilidade do ponto</label>
+                                <select class="input-field w-full py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300" id="visibilidade">
+                                    <option value="3">Alta</option>
+                                    <option value="2">Média</option>
+                                    <option value="1">Baixa</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="w-full py-3 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold rounded-lg shadow-md transition duration-300 ease-in-out flex items-center justify-center">
+                            <i class="fas fa-calculator mr-2"></i> Calcular Viabilidade
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Dashboard Section -->
+            <div id="dashboardSection" class="lg:col-span-2">
+                <div class="card bg-white rounded-xl p-6">
+                    <div class="flex flex-wrap items-center justify-between mb-6 pb-3 border-b-2 border-purple-200">
+                        <h2 class="text-2xl font-bold text-gray-800 flex items-center">
+                            <i class="fas fa-chart-bar text-purple-600 mr-3"></i>
+                            Análise de Viabilidade
+                        </h2>
+                    </div>
+                    
+                    <!-- Resumo do Investimento -->
+                    <div class="bg-indigo-50 rounded-xl p-5 mb-8 border border-indigo-100">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                            <div>
+                                <p class="text-gray-600">Total Investimento</p>
+                                <p id="totalInvestimento" class="text-2xl font-bold text-indigo-700">R$ 0,00</p>
+                            </div>
+                            <div>
+                                <p class="text-gray-600">Custos Mensais</p>
+                                <p id="totalCustos" class="text-2xl font-bold text-indigo-700">R$ 0,00</p>
+                            </div>
+                            <div>
+                                <p class="text-gray-600">Receita Mensal</p>
+                                <p id="totalReceita" class="text-2xl font-bold text-indigo-700">R$ 0,00</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Alertas Principais -->
+                    <div id="alertsSection" class="mb-8 space-y-4"></div>
+                    
+                    <!-- Indicadores Principais -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                        <!-- Payback -->
+                        <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                            <div class="bg-indigo-500 text-white px-4 py-3 flex items-center">
+                                <i class="fas fa-hourglass-half mr-2"></i>
+                                <h3 class="font-semibold">Payback Estimado</h3>
+                            </div>
+                            <div class="p-4 flex flex-col items-center">
+                                <div class="text-3xl font-bold text-indigo-600 mb-2" id="payback">0 meses</div>
+                                <div id="paybackTag" class="result-tag px-3 py-1 rounded-full text-sm font-semibold">N/A</div>
+                                <div class="mt-3 w-full bg-gray-200 rounded-full h-2.5">
+                                    <div id="paybackBar" class="bg-indigo-600 h-2.5 rounded-full" style="width: 0%"></div>
+                                </div>
+                                <p class="text-sm text-gray-600 mt-2 text-center">Tempo para recuperar o investimento inicial</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Ponto de Equilíbrio -->
+                        <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                            <div class="bg-purple-500 text-white px-4 py-3 flex items-center">
+                                <i class="fas fa-balance-scale mr-2"></i>
+                                <h3 class="font-semibold">Ponto de Equilíbrio</h3>
+                            </div>
+                            <div class="p-4 flex flex-col items-center">
+                                <div class="text-3xl font-bold text-purple-600 mb-2" id="equilibrio">R$ 0,00</div>
+                                <div id="equilibrioTag" class="result-tag px-3 py-1 rounded-full text-sm font-semibold">N/A</div>
+                                <div class="mt-3 w-full bg-gray-200 rounded-full h-2.5">
+                                    <div id="equilibrioBar" class="bg-purple-600 h-2.5 rounded-full" style="width: 0%"></div>
+                                </div>
+                                <p class="text-sm text-gray-600 mt-2 text-center">Faturamento mínimo para não ter prejuízo</p>
+                            </div>
+                        </div>
+                        
+                        <!-- ROI -->
+                        <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                            <div class="bg-green-500 text-white px-4 py-3 flex items-center">
+                                <i class="fas fa-chart-pie mr-2"></i>
+                                <h3 class="font-semibold">ROI Anual</h3>
+                            </div>
+                            <div class="p-4 flex flex-col items-center">
+                                <div class="text-3xl font-bold text-green-600 mb-2" id="roi">0%</div>
+                                <div id="roiTag" class="result-tag px-3 py-1 rounded-full text-sm font-semibold">N/A</div>
+                                <div class="mt-3 w-full bg-gray-200 rounded-full h-2.5">
+                                    <div id="roiBar" class="bg-green-600 h-2.5 rounded-full" style="width: 0%"></div>
+                                </div>
+                                <p class="text-sm text-gray-600 mt-2 text-center">Retorno sobre o Investimento</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Gráficos -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                        <!-- Gráfico de Composição de Custos -->
+                        <div class="card bg-white p-4 rounded-xl">
+                            <h3 class="font-semibold text-lg text-gray-800 mb-4">Composição de Custos</h3>
+                            <div class="h-64">
+                                <canvas id="costCompositionChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <!-- Termômetro de Risco/Retorno -->
+                        <div class="card bg-white p-4 rounded-xl">
+                            <h3 class="font-semibold text-lg text-gray-800 mb-4">Risco vs Retorno</h3>
+                            <div class="h-64 flex items-center justify-center">
+                                <div class="thermometer">
+                                    <div class="thermal-bg">
+                                        <div id="thermalFluid" class="thermal-fluid"></div>
+                                    </div>
+                                    <div class="thermal-bulb"></div>
+                                </div>
+                                <div class="ml-8 flex flex-col">
+                                    <span class="text-sm text-green-600"><i class="fas fa-arrow-up"></i> Alto Retorno</span>
+                                    <span class="text-sm text-yellow-500 mt-4"><i class="fas fa-arrows-alt-h"></i> Equilibrado</span>
+                                    <span class="text-sm text-red-500 mt-4"><i class="fas fa-arrow-down"></i> Alto Risco</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Radar de Localização -->
+                    <div class="card bg-white p-4 rounded-xl mb-8">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Avaliação da Localização</h3>
+                        <div class="h-64">
+                            <canvas id="locationRadarChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Projeção de Payback -->
+                    <div class="card bg-white p-4 rounded-xl">
+                        <h3 class="font-semibold text-lg text-gray-800 mb-4">Projeção de Payback</h3>
+                        <div class="h-64">
+                            <canvas id="paybackChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function atualizarRelogio() {
+          const agora = new Date();
+      
+          const dia = agora.getDate().toString().padStart(2, '0');
+          const mes = (agora.getMonth() + 1).toString().padStart(2, '0'); // Janeiro é 0
+          const ano = agora.getFullYear();
+      
+          const horas = agora.getHours().toString().padStart(2, '0');
+          const minutos = agora.getMinutes().toString().padStart(2, '0');
+          const segundos = agora.getSeconds().toString().padStart(2, '0');
+      
+          const dataFormatada = `${dia}/${mes}/${ano}`;
+          const horaFormatada = `${horas}:${minutos}:${segundos}`;
+      
+          document.getElementById('relogio').textContent = `${dataFormatada} ${horaFormatada}`;
+        }
+      
+        // Atualiza imediatamente e depois a cada 1 segundo
+        atualizarRelogio();
+        setInterval(atualizarRelogio, 1000);
+      </script>
+    <script>
+        // Configuração do Tailwind
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8'
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Controles do formulário
+        document.getElementById('franchiseForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            calculateMetrics();
+        });
+        
+        // Calcular automaticamente ao digitar nos campos
+        const inputs = document.querySelectorAll('#franchiseForm input, #franchiseForm select');
+        inputs.forEach(input => {
+            input.addEventListener('input', function() {
+                calculateMetrics();
+            });
+        });
+        
+        // Função principal de cálculo
+        function calculateMetrics() {
+            // Coletar valores do formulário
+            const formData = {
+                taxaFranquia: parseFloat(document.getElementById('taxaFranquia').value) || 0,
+                custoInstalacao: parseFloat(document.getElementById('custoInstalacao').value) || 0,
+                capitalGiro: parseFloat(document.getElementById('capitalGiro').value) || 0,
+                equipamentos: parseFloat(document.getElementById('equipamentos').value) || 0,
+                aluguel: parseFloat(document.getElementById('aluguel').value) || 0,
+                salarios: parseFloat(document.getElementById('salarios').value) || 0,
+                royalties: parseFloat(document.getElementById('royalties').value) || 0,
+                fundoPropaganda: parseFloat(document.getElementById('fundoPropaganda').value) || 0,
+                faturamentoMensal: parseFloat(document.getElementById('faturamentoMensal').value) || 0,
+                ticketMedio: parseFloat(document.getElementById('ticketMedio').value) || 0,
+                clientesMensais: parseFloat(document.getElementById('clientesMensais').value) || 0,
+                populacao: parseFloat(document.getElementById('populacao').value) || 0,
+                concorrentes: parseFloat(document.getElementById('concorrentes').value) || 0,
+                visibilidade: parseFloat(document.getElementById('visibilidade').value) || 0
+            };
+            
+            // Calcular valores derivados
+            const investimentoTotal = formData.taxaFranquia + formData.custoInstalacao + 
+                                    formData.capitalGiro + formData.equipamentos;
+            
+            const royaltiesMensal = formData.faturamentoMensal * (formData.royalties / 100);
+            const fundoPropagandaMensal = formData.faturamentoMensal * (formData.fundoPropaganda / 100);
+            
+            const custosFixos = formData.aluguel + formData.salarios + royaltiesMensal + fundoPropagandaMensal;
+            
+            // Calcular indicadores
+            const lucroMensal = formData.faturamentoMensal - custosFixos;
+            const payback = investimentoTotal / lucroMensal;
+            const pontoEquilibrio = custosFixos / (lucroMensal / formData.faturamentoMensal || 1);
+            const roi = ((lucroMensal * 12) / investimentoTotal) * 100;
+            
+            // Calcular índice de localização (0-100)
+            const concorrenciaScore = Math.max(0, 100 - (formData.concorrentes * 5));
+            const visibilidadeScore = formData.visibilidade * 33.33;
+            const densidadeScore = Math.min(100, formData.populacao * 0.001);
+            const localizacaoScore = (concorrenciaScore * 0.4) + (visibilidadeScore * 0.3) + (densidadeScore * 0.3);
+            
+            // Atualizar resumo
+            document.getElementById('totalInvestimento').textContent = formatCurrency(investimentoTotal);
+            document.getElementById('totalCustos').textContent = formatCurrency(custosFixos);
+            document.getElementById('totalReceita').textContent = formatCurrency(formData.faturamentoMensal);
+            
+            // Atualizar indicadores
+            document.getElementById('payback').textContent = `${payback.toFixed(1)} meses`;
+            document.getElementById('equilibrio').textContent = formatCurrency(pontoEquilibrio);
+            document.getElementById('roi').textContent = `${roi.toFixed(1)}%`;
+            
+            // Atualizar barras de progresso e tags
+            updatePaybackIndicator(payback);
+            updateEquilibrioIndicator(pontoEquilibrio, formData.faturamentoMensal);
+            updateROIIndicator(roi);
+            
+            // Atualizar alertas
+            updateAlerts(payback, roi, formData.concorrentes);
+            
+            // Atualizar termômetro de risco
+            updateThermometer(roi, payback);
+            
+            // Renderizar gráficos
+            renderCostCompositionChart(formData.aluguel, formData.salarios, royaltiesMensal, fundoPropagandaMensal);
+            renderLocationRadar(concorrenciaScore, visibilidadeScore, densidadeScore);
+            renderPaybackChart(investimentoTotal, lucroMensal, payback);
+        }
+        
+        // Funções auxiliares
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('pt-BR', { 
+                style: 'currency', 
+                currency: 'BRL',
+                minimumFractionDigits: 2
+            }).format(value);
+        }
+        
+        function updatePaybackIndicator(payback) {
+            const paybackTag = document.getElementById('paybackTag');
+            const paybackBar = document.getElementById('paybackBar');
+            
+            let paybackWidth;
+            let tagClass, tagText;
+            
+            if (payback < 18) {
+                paybackWidth = 25;
+                tagClass = 'bg-green-100 text-green-800';
+                tagText = 'Excelente';
+            } else if (payback < 24) {
+                paybackWidth = 50;
+                tagClass = 'bg-green-100 text-green-800';
+                tagText = 'Bom';
+            } else if (payback < 36) {
+                paybackWidth = 75;
+                tagClass = 'bg-yellow-100 text-yellow-800';
+                tagText = 'Atenção';
+            } else {
+                paybackWidth = 100;
+                tagClass = 'bg-red-100 text-red-800';
+                tagText = 'Risco';
+            }
+            
+            paybackBar.style.width = `${paybackWidth}%`;
+            paybackTag.className = `result-tag px-3 py-1 rounded-full text-sm font-semibold ${tagClass}`;
+            paybackTag.textContent = tagText;
+        }
+        
+        function updateEquilibrioIndicator(pontoEquilibrio, faturamento) {
+            const equilibrioTag = document.getElementById('equilibrioTag');
+            const equilibrioBar = document.getElementById('equilibrioBar');
+            
+            let percentual = (pontoEquilibrio / faturamento) * 100;
+            let barWidth, tagClass, tagText;
+            
+            if (percentual < 50) {
+                barWidth = percentual * 2;
+                tagClass = 'bg-green-100 text-green-800';
+                tagText = 'Boa Margem';
+            } else if (percentual < 70) {
+                barWidth = percentual * 2;
+                tagClass = 'bg-yellow-100 text-yellow-800';
+                tagText = 'Atenção';
+            } else {
+                barWidth = 100;
+                tagClass = 'bg-red-100 text-red-800';
+                tagText = 'Crítico';
+            }
+            
+            equilibrioBar.style.width = `${barWidth}%`;
+            equilibrioTag.className = `result-tag px-3 py-1 rounded-full text-sm font-semibold ${tagClass}`;
+            equilibrioTag.textContent = tagText;
+        }
+        
+        function updateROIIndicator(roi) {
+            const roiTag = document.getElementById('roiTag');
+            const roiBar = document.getElementById('roiBar');
+            
+            let barWidth, tagClass, tagText;
+            
+            if (roi > 25) {
+                barWidth = 100;
+                tagClass = 'bg-green-100 text-green-800';
+                tagText = 'Excelente';
+            } else if (roi > 15) {
+                barWidth = 75;
+                tagClass = 'bg-green-100 text-green-800';
+                tagText = 'Bom';
+            } else if (roi > 10) {
+                barWidth = 50;
+                tagClass = 'bg-yellow-100 text-yellow-800';
+                tagText = 'Regular';
+            } else {
+                barWidth = roi * 4;
+                if (barWidth > 100) barWidth = 100;
+                tagClass = 'bg-red-100 text-red-800';
+                tagText = 'Baixo';
+            }
+            
+            roiBar.style.width = `${barWidth}%`;
+            roiTag.className = `result-tag px-3 py-1 rounded-full text-sm font-semibold ${tagClass}`;
+            roiTag.textContent = tagText;
+        }
+        
+        function updateAlerts(payback, roi, concorrentes) {
+            const alertsSection = document.getElementById('alertsSection');
+            alertsSection.innerHTML = '';
+            
+            let alerts = [];
+            
+            // Payback alert
+            if (payback > 36) {
+                alerts.push({
+                    icon: 'exclamation-triangle',
+                    color: 'red',
+                    text: '🚨 Payback acima de 36 meses: investimento de alto risco!',
+                    details: 'Este prazo é muito longo para recuperar seu investimento. Considere reavaliar o projeto.'
+                });
+            } else if (payback > 24) {
+                alerts.push({
+                    icon: 'exclamation-circle',
+                    color: 'yellow',
+                    text: '⚠️ Payback entre 24 e 36 meses: atenção necessária.',
+                    details: 'Este prazo está na fronteira do aceitável. Avalie possíveis otimizações.'
+                });
+            }
+            
+            // ROI alert
+            if (roi < 10) {
+                alerts.push({
+                    icon: 'exclamation-triangle',
+                    color: 'red',
+                    text: '🔻 ROI abaixo de 10%: retorno insatisfatório!',
+                    details: 'O retorno anual estimado é inferior ao rendimento de investimentos conservadores.'
+                });
+            } else if (roi > 20) {
+                alerts.push({
+                    icon: 'check-circle',
+                    color: 'green',
+                    text: '📈 ROI acima de 20%: ótima oportunidade!',
+                    details: 'Este retorno anual supera expectativas de mercado. Potencial de negócio promissor.'
+                });
+            }
+            
+            // Competition alert
+            if (concorrentes >= 5) {
+                alerts.push({
+                    icon: 'exclamation-triangle',
+                    color: 'red',
+                    text: '🔎 Alta concorrência: avaliar diferenciais da franquia',
+                    details: 'Há muitos concorrentes na região. Garanta que seu modelo tem diferenciais competitivos.'
+                });
+            }
+            
+            // Positive alerts if no issues
+            if (alerts.length === 0) {
+                alerts.push({
+                    icon: 'check-circle',
+                    color: 'green',
+                    text: '✅ Parabéns! O modelo demonstra boa viabilidade.',
+                    details: 'Os indicadores analisados mostram potencial positivo para investimento.'
+                });
+            }
+            
+            // Render alerts
+            alerts.forEach(alert => {
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `flex items-start p-4 rounded-lg border border-${alert.color}-200 bg-${alert.color}-50`;
+                alertDiv.innerHTML = `
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-${alert.icon} text-${alert.color}-500 text-xl mt-1"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="font-medium text-${alert.color}-800">${alert.text}</p>
+                        <p class="mt-1 text-sm text-${alert.color}-700">${alert.details}</p>
+                    </div>
+                `;
+                alertsSection.appendChild(alertDiv);
+            });
+        }
+        
+        function updateThermometer(roi, payback) {
+            const thermalFluid = document.getElementById('thermalFluid');
+            
+            // Score combinado baseado em ROI e Payback
+            let score = (roi / 2) - (payback / 2);
+            
+            // Limitar ao intervalo 0-100
+            score = Math.min(100, Math.max(0, score));
+            
+            thermalFluid.style.height = `${score}%`;
+        }
+        
+        function renderCostCompositionChart(aluguel, salarios, royalties, fundoPropaganda) {
+            const ctx = document.getElementById('costCompositionChart').getContext('2d');
+            
+            if (window.costChart && typeof window.costChart.destroy === 'function') {
+                window.costChart.destroy();
+            }
+            
+            window.costChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Aluguel', 'Salários', 'Royalties', 'Fundo Propaganda'],
+                    datasets: [{
+                        data: [aluguel, salarios, royalties, fundoPropaganda],
+                        backgroundColor: [
+                            '#4F46E5',
+                            '#10B981',
+                            '#F59E0B',
+                            '#EF4444'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                font: {
+                                    size: 11
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.raw;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = Math.round((value / total) * 100);
+                                    return `${label}: ${formatCurrency(value)} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function renderLocationRadar(concorrenciaScore, visibilidadeScore, densidadeScore) {
+            const ctx = document.getElementById('locationRadarChart').getContext('2d');
+            
+            if (window.radarChart && typeof window.radarChart.destroy === 'function') {
+                window.radarChart.destroy();
+            }
+            
+            window.radarChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Baixa Concorrência', 'Visibilidade', 'Densidade'],
+                    datasets: [{
+                        label: 'Pontuação',
+                        data: [concorrenciaScore, visibilidadeScore, densidadeScore],
+                        backgroundColor: 'rgba(79, 70, 229, 0.2)',
+                        borderColor: '#4F46E5',
+                        pointBackgroundColor: '#4F46E5',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: '#4F46E5',
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: {
+                                display: true,
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            },
+                            suggestedMin: 0,
+                            suggestedMax: 100,
+                            ticks: {
+                                stepSize: 20
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.label}: ${Math.round(context.raw)}/100`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function renderPaybackChart(investimento, lucroMensal, payback) {
+            const ctx = document.getElementById('paybackChart').getContext('2d');
+            
+            if (window.paybackChart && typeof window.paybackChart.destroy === 'function') {
+                window.paybackChart.destroy();
+            }
+            
+            // Gerar dados para o gráfico
+            const months = Math.min(Math.ceil(payback) + 3, 60);
+            const labels = [];
+            const dataSaldo = [];
+            let saldoAcumulado = -investimento;
+            
+            for (let i = 0; i <= months; i++) {
+                labels.push(`Mês ${i}`);
+                dataSaldo.push(saldoAcumulado);
+                
+                if (i < months) {
+                    saldoAcumulado += lucroMensal;
+                }
+            }
+            
+            window.paybackChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Saldo Acumulado',
+                            data: dataSaldo,
+                            borderColor: '#10B981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            tension: 0.3,
+                            fill: true,
+                            pointRadius: 0,
+                            animation: {
+                                duration: 1000
+                            }
+                        },
+                        {
+                            label: 'Ponto de Equilíbrio',
+                            data: new Array(labels.length).fill(0),
+                            borderColor: '#EF4444',
+                            borderDash: [5, 5],
+                            borderWidth: 2,
+                            pointRadius: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return formatCurrency(value);
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${formatCurrency(context.raw)}`;
+                                }
+                            }
+                        },
+                        annotation: {
+                            annotations: {
+                                paybackPoint: {
+                                    type: 'point',
+                                    xValue: Math.round(payback),
+                                    yValue: 0,
+                                    radius: 6,
+                                    backgroundColor: 'rgba(239, 68, 68, 1)',
+                                    borderWidth: 2,
+                                    borderColor: '#fff'
+                                }
+                            }
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    }
+                }
+            });
+        }
+        
+        // Pré-cálculo para demonstração
+        document.addEventListener('DOMContentLoaded', function() {
+            // Preencher formulário com dados de demonstração
+            // Valores de exemplo mais realistas
+            document.getElementById('taxaFranquia').value = 80000;
+            document.getElementById('custoInstalacao').value = 50000;
+            document.getElementById('capitalGiro').value = 30000;
+            document.getElementById('equipamentos').value = 40000;
+            document.getElementById('aluguel').value = 7500;
+            document.getElementById('salarios').value = 18000;
+            document.getElementById('royalties').value = 5;
+            document.getElementById('fundoPropaganda').value = 2;
+            document.getElementById('faturamentoMensal').value = 50000;
+            document.getElementById('ticketMedio').value = 50;
+            document.getElementById('clientesMensais').value = 1000;
+            document.getElementById('populacao').value = 80000;
+            document.getElementById('concorrentes').value = 2;
+            document.getElementById('visibilidade').value = "3";
+
+            // Adicionar evento ao botão de simulação
+            // Calcular inicialmente
+            calculateMetrics();
+        });
+    </script><script>
+  fetch('dados.json')
+    .then(response => response.json())
+    .then(dados => {
+      const senhaCorreta = dados.senha;
+      const dataLimite = new Date(dados.validade);
+      const hoje = new Date();
+
+      const senhaLocalStorage = localStorage.getItem("senha");
+
+      if (senhaLocalStorage !== senhaCorreta) {
+        window.location.href = "login.html";
+      } else if (hoje >= dataLimite) {
+        window.location.href = "licenca_vencida.html";
+      }
+    })
+    .catch(error => {
+      console.error('Erro ao carregar dados.json:', error);
+      // Em caso de erro, redireciona por segurança
+      window.location.href = "login.html";
+    });
+</script>
+
+
+</body>
+</html>
